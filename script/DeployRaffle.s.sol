@@ -6,15 +6,14 @@ import {Raffle} from "../src/Raffle.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
 import {CreateSubscription, FundSubscription, AddConsumer} from "./Interactions.s.sol";
 
-contract DeployRaffle is Script{
-
+contract DeployRaffle is Script {
     function run() public {
         deployRaffle();
     }
+
     event RaffleDeployed(address indexed raffleAddress, uint256 subscriptionId);
 
-    function deployRaffle() public returns (Raffle , HelperConfig) {
-
+    function deployRaffle() public returns (Raffle, HelperConfig) {
         HelperConfig helperConfig = new HelperConfig();
         HelperConfig.NetworkConfig memory config = helperConfig.getConfigByChainID(block.chainid);
 
@@ -22,7 +21,7 @@ contract DeployRaffle is Script{
         if (config.subscriptionId == 0) {
             //create a subscription if it doesn't exist
             CreateSubscription createSub = new CreateSubscription();
-            (config.subscriptionId,config.vrfCoordinator) = 
+            (config.subscriptionId, config.vrfCoordinator) =
                 createSub.createSubscription(config.vrfCoordinator, config.account);
             //fund the subscription
             FundSubscription fundSub = new FundSubscription();
@@ -30,7 +29,7 @@ contract DeployRaffle is Script{
         }
 
         require(config.vrfCoordinator != address(0), "Invalid VRF Coordinator");
-        
+
         vm.startBroadcast();
         Raffle raffle = new Raffle(
             config.entranceFee,

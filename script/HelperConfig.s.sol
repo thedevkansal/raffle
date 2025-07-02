@@ -9,7 +9,6 @@ import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VR
 error HelperConfig__InvalidChainID(uint256 chainID);
 
 abstract contract CodeConstants {
-
     // Constants for VRF Coordinator and LINK Token
     uint96 public constant MOCK_BASE_FEE = 0.0001 ether;
     uint96 public constant MOCK_GAS_PRICE = 0.0001 ether;
@@ -22,7 +21,6 @@ abstract contract CodeConstants {
 }
 
 contract HelperConfig is Script, CodeConstants {
-
     // Struct to hold network configuration
     struct NetworkConfig {
         uint256 entranceFee;
@@ -31,7 +29,7 @@ contract HelperConfig is Script, CodeConstants {
         uint256 subscriptionId;
         bytes32 keyHash;
         address vrfCoordinator;
-        address linkToken; 
+        address linkToken;
         address account;
     }
 
@@ -63,8 +61,7 @@ contract HelperConfig is Script, CodeConstants {
         }
     }
 
-    function getSepoliaEthConfig() public pure returns (NetworkConfig memory sepoliaNetworkConfig)
-     {
+    function getSepoliaEthConfig() public pure returns (NetworkConfig memory sepoliaNetworkConfig) {
         sepoliaNetworkConfig = NetworkConfig({
             entranceFee: 0.01 ether,
             interval: 30 seconds,
@@ -72,8 +69,8 @@ contract HelperConfig is Script, CodeConstants {
             // subscriptionId: 0, // If left as 0, our scripts will create one!
             subscriptionId: 56366666119855030900385025988053281014962739498258270886678512497083887099238,
             // this subscription was created on chainlink vrf but giving errors idk why uint64 Vs uint256 shit
-            keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,// Sepolia keyHash
-            vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B,// Sepolia VRF Coordinator address
+            keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae, // Sepolia keyHash
+            vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B, // Sepolia VRF Coordinator address
             linkToken: 0x779877A7B0D9E8603169DdbD7836e478b4624789, // Sepolia LINK Token address
             account: 0x2780E5a97166BaEE7122D15AD5C779612613A34F //My account on Metamask
         });
@@ -81,17 +78,16 @@ contract HelperConfig is Script, CodeConstants {
 
     // these paramaters are derived from docs.chain.link/
 
-    function getMainnetEthConfig() public pure returns (NetworkConfig memory mainnetNetworkConfig)
-    {
+    function getMainnetEthConfig() public pure returns (NetworkConfig memory mainnetNetworkConfig) {
         mainnetNetworkConfig = NetworkConfig({
             entranceFee: 0.01 ether,
-            interval: 30, 
-            callbackGasLimit: 500000, 
-            subscriptionId: 0, 
+            interval: 30,
+            callbackGasLimit: 500000,
+            subscriptionId: 0,
             keyHash: 0x3fd2fec10d06ee8f65e7f2e95f5c56511359ece3f33960ad8a866ae24a8ff10b,
             vrfCoordinator: 0xD7f86b4b8Cae7D942340FF628F82735b7a20893a,
             linkToken: 0x514910771AF9Ca656af840dff83E8264EcF986CA,
-            account: 0x2780E5a97166BaEE7122D15AD5C779612613A34F 
+            account: 0x2780E5a97166BaEE7122D15AD5C779612613A34F
         });
     }
 
@@ -101,7 +97,6 @@ contract HelperConfig is Script, CodeConstants {
      * @return NetworkConfig The configuration for the local network.
      */
     function getOrCreateLocalConfig() public returns (NetworkConfig memory) {
-
         // If the local network config is already set, return it
         if (localNetworkConfig.vrfCoordinator != address(0)) {
             return localNetworkConfig;
@@ -109,11 +104,8 @@ contract HelperConfig is Script, CodeConstants {
 
         // Deploy the mock VRF Coordinator and Link Token
         vm.startBroadcast();
-        VRFCoordinatorV2_5Mock vrfCoordinatorMock = new VRFCoordinatorV2_5Mock(
-            MOCK_BASE_FEE,
-            MOCK_GAS_PRICE,
-            MOCK_WEI_PER_UNIT_LINK
-        );
+        VRFCoordinatorV2_5Mock vrfCoordinatorMock =
+            new VRFCoordinatorV2_5Mock(MOCK_BASE_FEE, MOCK_GAS_PRICE, MOCK_WEI_PER_UNIT_LINK);
         // Create a new Link Token instance
         LinkToken linkToken = new LinkToken();
         // Create a subscription on the mock VRF Coordinator
@@ -122,7 +114,7 @@ contract HelperConfig is Script, CodeConstants {
 
         console2.log("Deployed Mock VRF Coordinator at:", address(vrfCoordinatorMock));
         console2.log("Deployed LinkToken at:", address(linkToken));
-        console2.log("Created subscription ID:", subscriptionId);   
+        console2.log("Created subscription ID:", subscriptionId);
 
         // Set the local network configuration
         localNetworkConfig = NetworkConfig({
@@ -143,12 +135,15 @@ contract HelperConfig is Script, CodeConstants {
     function getVRFCoordinator() public returns (address) {
         return getConfigByChainID(block.chainid).vrfCoordinator;
     }
+
     function getAccount() public returns (address) {
         return getConfigByChainID(block.chainid).account;
     }
+
     function getLink() public returns (address) {
         return getConfigByChainID(block.chainid).linkToken;
-    }   
+    }
+
     function getSubscriptionId() public returns (uint256) {
         return getConfigByChainID(block.chainid).subscriptionId;
     }
